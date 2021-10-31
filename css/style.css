@@ -1,0 +1,103 @@
+* {
+    box-sizing: border-box;
+}
+body {
+    background-color: rgb(190, 155, 255);
+}
+.main {
+    width: 70%;
+    margin: auto;
+    height: 100vh;
+}
+h1 {
+    color: white;
+    text-align: center;
+}
+.hide {
+    color: white;
+    display: block;
+    text-align: center;
+}
+svg {
+    width: 250px;
+    height: 300px;
+    fill: transparent;
+    stroke: #fff;
+    stroke-width: 5px;
+    stroke-linecap: round;
+}
+.figure {
+    display: none;
+}
+.gibbet {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+#wrong-letter {
+    color: white;
+    position: absolute;
+    right: 30px;
+    top: 20px;
+    text-align: right;
+}
+#wrong-letter span {
+    font-size: 20px;
+}
+.word {
+    color: white;
+    display: flex;
+    font-size: 30px;
+    justify-content: space-between;
+    width: 350px;
+}
+.letter {
+    border-bottom: 2px solid rgb(111, 0, 255);
+    display: inline-flex;
+    font-size: 30px;
+    align-items: center;
+    justify-content: center;
+    height: 50px;
+    width: 20px;
+}
+.won {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.4);
+    margin: 10px auto;
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    visibility: hidden;
+}
+#message {
+    color: white;
+    text-align: center;
+    margin-top: 150px;
+}
+#play {
+    width: 150px;
+    height: 40px;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-top: 100px;
+    color: rgb(44, 0, 44);
+}
+
+.not {
+    display: block;
+    text-align: center;
+    color: red;
+    margin-top: 50px;
+    visibility: hidden;
+}
+h2 {
+    font-size: 35px;
+}
+.show {
+    visibility: visible;
+}
