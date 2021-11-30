@@ -8,7 +8,8 @@ let winner = document.querySelector('.won')
 
 let figure = document.querySelectorAll('.figure');
 
-let words = ['მაღაზია', 'ბიბლიოთეკა', 'ნაყინი', 'კატასტროფა', 'შანდალი', 'პანკრეასი', 'არასრულწლოვანი', 'დენთი', 'პარაკლისი', 'შვეიცარი', 'თორნიკე-ბურჯანაძე']; 
+let words = ['მაღაზია', 'ბიბლიოთეკა', 'ნაყინი', 'კატასტროფა', 'შანდალი', 'პანკრეასი', 'არასრულწლოვანი', 'დენთი', 'პარაკლისი', 'შვეიცარი', 'პარალელეპიპედი', 'არმია', 'ტრანკვილიზატორი', 'ტალახი', 'ძეხვი', 'მანდარინი', 'გალაქტიკა', 'ტორტი', 'პარაშუტი', 'ფერი', 'კალამი', 'წუმპე', 'ჯოხი', 'ჭადრაკი', 'პირანია', 'ჯალათი', 'ფერია', 'გონჯი', 'მხედარი']
+
 
 let selectedWord = words[Math.floor(Math.random() * words.length)];
 
@@ -24,7 +25,8 @@ function ShowWord() {
       .map(
         letter => `
           <span class="letter">
-            ${correct.includes(letter) ? letter : ''}
+ 
+           ${correct.includes(letter) ? letter : ''}
           </span>
         `
       )
@@ -96,14 +98,8 @@ window.addEventListener('keydown', e => {
 
 
   play.addEventListener('click', () => {
-        correct.splice(0);
-        incorrect.splice(0);
-
-        ShowWord();
-
-        WrongLetter();
-
-        winner.style.visibility = "hidden";
+        
+        location.reload();
   })
 
 ShowWord();
