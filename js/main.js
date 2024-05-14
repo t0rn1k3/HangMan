@@ -1,17 +1,27 @@
-let word = document.getElementById('word');
-let wrong = document.getElementById('wrong-letter');
-let won = document.getElementById('won');
-let message = document.getElementById('message');
-let play = document.getElementById('play');
-let notification = document.getElementById('not');
-let winner = document.querySelector('.won')
+const word = document.getElementById('word');
+const clueText = document.getElementById('clueText')
+const wrong = document.getElementById('wrong-letter');
+const won = document.getElementById('won');
+const message = document.getElementById('message');
+const play = document.getElementById('play');
+const notification = document.getElementById('not');
+const winner = document.querySelector('.won')
 
-let figure = document.querySelectorAll('.figure');
+const figure = document.querySelectorAll('.figure');
 
-let words = ['მაღაზია', 'ბიბლიოთეკა', 'ნაყინი', 'კატასტროფა', 'შანდალი', 'პანკრეასი', 'არასრულწლოვანი', 'დენთი', 'პარაკლისი', 'შვეიცარი', 'პარალელეპიპედი', 'არმია', 'ტრანკვილიზატორი', 'ტალახი', 'ძეხვი', 'მანდარინი', 'გალაქტიკა', 'ტორტი', 'პარაშუტი', 'ფერი', 'კალამი', 'წუმპე', 'ჯოხი', 'ჭადრაკი', 'პირანია', 'ჯალათი', 'ფერია', 'გონჯი', 'მხედარი']
+const words = [
+  {
+    word : 'მხედარი',
+    clue : "ჭადრაკი"
+  },
+  {
+    word : 'კურდღელი',
+    clue : "Looney Toons"
+  },
+]
 
 
-let selectedWord = words[Math.floor(Math.random() * words.length)];
+const selectedWord = words[Math.floor(Math.random() * words.length)];
 
 let correct = [];
 let incorrect = [];
@@ -20,7 +30,7 @@ let incorrect = [];
 
 function ShowWord() {
     word.innerHTML = `
-    ${selectedWord
+    ${selectedWord.word
       .split('')
       .map(
         letter => `
@@ -32,6 +42,8 @@ function ShowWord() {
       )
       .join('')}
   `;
+
+  clueText.innerText = selectedWord.clue;
 
   let inner = word.innerText.replace(/\n/g, '');
 
@@ -76,7 +88,7 @@ window.addEventListener('keydown', e => {
     if (e.keyCode >= 65 && e.keyCode <= 90) {
       let letter = e.key;
   
-      if (selectedWord.includes(letter)) {
+      if (selectedWord.word.includes(letter)) {
         if (!correct.includes(letter)) {
           correct.push(letter);
   

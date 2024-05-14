@@ -52,6 +52,14 @@ svg {
     justify-content: space-between;
     width: 350px;
 }
+.clue {
+    color: white;
+    margin-top: 100px;
+    font-size: 20px;
+}
+.clueText {
+    font-style: italic;
+}
 .letter {
     border-bottom: 2px solid rgb(244, 236, 255);
     display: inline-flex;
