@@ -2,7 +2,7 @@
     box-sizing: border-box;
 }
 body {
-    background-color: rgb(111, 35, 252);
+    background-color: #002379;
 }
 .main {
     width: 70%;
@@ -58,6 +58,7 @@ svg {
     font-size: 20px;
 }
 .clueText {
+    color: #FFC55A;
     font-style: italic;
 }
 .letter {

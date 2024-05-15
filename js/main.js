@@ -11,12 +11,64 @@ const figure = document.querySelectorAll('.figure');
 
 const words = [
   {
-    word : 'მხედარი',
+    word : "მხედარი",
     clue : "ჭადრაკი"
   },
   {
-    word : 'კურდღელი',
+    word : "კურდღელი",
     clue : "Looney Toons"
+  },
+  {
+    word : "პარლამენტი",
+    clue : "5 ნოემბერი"
+  },
+  {
+    word : "გილიოტინა",
+    clue : "ლუი XVI"
+  },
+  {
+    word : "დრაკულა",
+    clue : "რუმინეთი"
+  },
+  {
+    word : "მიკროფონი",
+    clue : "სცენა"
+  },
+  {
+    word : "ჯალათი",
+    clue : "ყველაზე შესამჩნევი სიტყვა"
+  },
+  {
+    word : "პარტიზანი",
+    clue : "დისკო"
+  },
+  {
+    word : "ჯეირანი",
+    clue : "ქურციკი"
+  },
+  {
+    word : "ლივერპული",
+    clue : "ბითლზი"
+  },
+  {
+    word : "მწვრთნელი",
+    clue : "ფეოლა"
+  },
+  {
+    word : "ტელევიზორი",
+    clue : "ანტენა"
+  },
+  {
+    word : "სათამაშო",
+    clue : "რევოლუციამდელი ბავშვი"
+  },
+  {
+    word : "ჩირაღდანი",
+    clue : "ცეცხლი"
+  },
+  {
+    word : "შეჰერაზადი",
+    clue : "1001 ღამე"
   },
 ]
 
@@ -46,8 +98,9 @@ function ShowWord() {
   clueText.innerText = selectedWord.clue;
 
   let inner = word.innerText.replace(/\n/g, '');
+  console.log(inner)
 
-  if (inner == selectedWord) {
+  if (inner === selectedWord.word) {
     message.innerText = 'გილოცავთ! თქვენ გაიმარჯვეთ';
     winner.style.visibility = "visible";
   }
