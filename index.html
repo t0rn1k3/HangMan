@@ -11,7 +11,18 @@
 </head>
 <body>
     <div class="main">
-        <h1>ჯალათი</h1>
+        <header class="gameHeader">
+            <h1>ჯალათი</h1>
+            <p class="playerLine" id="playerLine">
+                მოთამაშე: <span id="playerDisplayName"></span>
+                <button type="button" class="setNameBtn" id="setNameBtn" aria-controls="nameEditor" aria-expanded="false">სახელი</button>
+            </p>
+            <div class="nameEditor" id="nameEditor" hidden>
+                <label class="nameLabel screenReader" for="playerNameHeader">სახელი</label>
+                <input class="nameInput" type="text" id="playerNameHeader" maxlength="32" autocomplete="nickname" placeholder="თქვენი სახელი" />
+                <button type="button" class="saveHeaderNameBtn" id="saveHeaderName">შენახვა</button>
+            </div>
+        </header>
         <p class="scorebar" id="scorebar">ჯამური ქულა: <span id="sessionScore">0</span></p>
         <p class="hide">იპოვეთ დამალული სიტყვა</p>
         <div class="gibbet">

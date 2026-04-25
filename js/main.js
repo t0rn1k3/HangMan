@@ -11,6 +11,11 @@ const playerNameInput = document.getElementById('playerName');
 const saveScoreBtn = document.getElementById('saveScore');
 const saveFeedback = document.getElementById('saveFeedback');
 const leaderboardList = document.getElementById('leaderboardList');
+const playerDisplayName = document.getElementById('playerDisplayName');
+const nameEditor = document.getElementById('nameEditor');
+const playerNameHeader = document.getElementById('playerNameHeader');
+const saveHeaderName = document.getElementById('saveHeaderName');
+const setNameBtn = document.getElementById('setNameBtn');
 const winner = document.querySelector('.won')
 
 const figure = document.querySelectorAll('.figure');
@@ -130,6 +135,20 @@ function setStoredName(name) {
   }
 }
 
+function updatePlayerDisplay() {
+  if (playerDisplayName) {
+    playerDisplayName.textContent = getStoredName() || ANONYMOUS;
+  }
+}
+
+function getResolvedPlayerName() {
+  const fromModal = playerNameInput && playerNameInput.value.trim();
+  if (fromModal) return fromModal;
+  const stored = getStoredName();
+  if (stored) return stored;
+  return ANONYMOUS;
+}
+
 function loadScores() {
   try {
     const raw = localStorage.getItem(STORAGE_SCORES);
@@ -198,9 +217,14 @@ function sessionEndSaveSnapshot() {
 }
 
 function trySaveScore() {
-  const raw = playerNameInput && playerNameInput.value ? playerNameInput.value.trim() : '';
-  const name = raw || ANONYMOUS;
-  if (playerNameInput && raw) setStoredName(raw);
+  const name = getResolvedPlayerName();
+  if (name !== ANONYMOUS) {
+    setStoredName(name);
+  }
+  updatePlayerDisplay();
+  if (playerNameInput) {
+    playerNameInput.value = getStoredName() || '';
+  }
 
   const snap = sessionEndSaveSnapshot();
   const record = {
@@ -383,8 +407,63 @@ if (playerNameInput) {
   playerNameInput.addEventListener('change', () => {
     const v = playerNameInput.value.trim();
     if (v) setStoredName(v);
+    updatePlayerDisplay();
+  });
+}
+
+function initPlayerNameUI() {
+  updatePlayerDisplay();
+  if (nameEditor) {
+    nameEditor.hidden = !!getStoredName();
+  }
+  if (playerNameHeader) {
+    playerNameHeader.value = getStoredName();
+  }
+  if (setNameBtn && nameEditor) {
+    setNameBtn.setAttribute('aria-expanded', String(!nameEditor.hidden));
+  }
+}
+
+if (setNameBtn && nameEditor) {
+  setNameBtn.addEventListener('click', () => {
+    const willShow = nameEditor.hidden;
+    nameEditor.hidden = !willShow;
+    setNameBtn.setAttribute('aria-expanded', String(willShow));
+    if (willShow && playerNameHeader) {
+      playerNameHeader.value = getStoredName();
+      playerNameHeader.focus();
+    }
+  });
+}
+
+if (saveHeaderName) {
+  saveHeaderName.addEventListener('click', () => {
+    const v = playerNameHeader ? playerNameHeader.value.trim() : '';
+    if (v) {
+      setStoredName(v);
+    } else {
+      try {
+        localStorage.removeItem(STORAGE_NAME);
+      } catch {
+        /* */
+      }
+    }
+    updatePlayerDisplay();
+    if (playerNameInput) playerNameInput.value = getStoredName() || '';
+    if (nameEditor) nameEditor.hidden = true;
+    if (setNameBtn) setNameBtn.setAttribute('aria-expanded', 'false');
+  });
+}
+
+if (playerNameHeader) {
+  playerNameHeader.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (saveHeaderName) saveHeaderName.click();
+    }
   });
 }
 
 renderLeaderboard();
+initPlayerNameUI();
 startNewGame();
