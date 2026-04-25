@@ -3,7 +3,7 @@ const clueText = document.getElementById('clueText');
 const wrong = document.getElementById('wrong-letter');
 const message = document.getElementById('message');
 const roundScoreEl = document.getElementById('roundScore');
-const sessionScoreEl = document.getElementById('sessionScore');
+const stepProgressEl = document.getElementById('stepProgress');
 const play = document.getElementById('play');
 const viewSummary = document.getElementById('viewSummary');
 const roundProgressEl = document.getElementById('roundProgress');
@@ -12,97 +12,49 @@ const afterSummary = document.getElementById('afterSummary');
 const newGameFromSummary = document.getElementById('newGameFromSummary');
 const notification = document.getElementById('not');
 const savePanel = document.getElementById('savePanel');
-const playerNameInput = document.getElementById('playerName');
 const saveScoreBtn = document.getElementById('saveScore');
 const saveFeedback = document.getElementById('saveFeedback');
 const leaderboardList = document.getElementById('leaderboardList');
 const playerDisplayName = document.getElementById('playerDisplayName');
-const nameEditor = document.getElementById('nameEditor');
-const playerNameHeader = document.getElementById('playerNameHeader');
-const saveHeaderName = document.getElementById('saveHeaderName');
-const setNameBtn = document.getElementById('setNameBtn');
-const winner = document.querySelector('.won')
+const nameGate = document.getElementById('nameGate');
+const nameGateInput = document.getElementById('nameGateInput');
+const nameGateStart = document.getElementById('nameGateStart');
+const gameScreen = document.getElementById('gameScreen');
+const wordNavPrev = document.getElementById('wordNavPrev');
+const wordNavNext = document.getElementById('wordNavNext');
+const roundInline = document.getElementById('roundInline');
+const retryRow = document.getElementById('retryRow');
+const btnRetry = document.getElementById('btnRetry');
+const btnSaveLoss = document.getElementById('btnSaveLoss');
+const winner = document.querySelector('.won');
 
 const figure = document.querySelectorAll('.figure');
 
 const words = [
-  {
-    word : "მხედარი",
-    clue : "ჭადრაკი"
-  },
-  {
-    word : "კურდღელი",
-    clue : "Looney Toons"
-  },
-  {
-    word : "პარლამენტი",
-    clue : "5 ნოემბერი"
-  },
-  {
-    word : "გილიოტინა",
-    clue : "ლუი XVI"
-  },
-  {
-    word : "დრაკულა",
-    clue : "რუმინეთი"
-  },
-  {
-    word : "მიკროფონი",
-    clue : "სცენა"
-  },
-  {
-    word : "ჯალათი",
-    clue : "ყველაზე შესამჩნევი სიტყვა"
-  },
-  {
-    word : "პარტიზანი",
-    clue : "დისკო"
-  },
-  {
-    word : "ჯეირანი",
-    clue : "ქურციკი"
-  },
-  {
-    word : "ლივერპული",
-    clue : "ბითლზი"
-  },
-  {
-    word : "მწვრთნელი",
-    clue : "ფეოლა"
-  },
-  {
-    word : "ტელევიზორი",
-    clue : "ანტენა"
-  },
-  {
-    word : "სათამაშო",
-    clue : "რევოლუციამდელი ბავშვი"
-  },
-  {
-    word : "ჩირაღდანი",
-    clue : "ცეცხლი"
-  },
-  {
-    word : "შეჰერაზადი",
-    clue : "1001 ღამე"
-  },
-]
+  { word: 'მხედარი', clue: 'ჭადრაკი' },
+  { word: 'კურდღელი', clue: 'Looney Toons' },
+  { word: 'პარლამენტი', clue: '5 ნოემბერი' },
+  { word: 'გილიოტინა', clue: 'ლუი XVI' },
+  { word: 'დრაკულა', clue: 'რუმინეთი' },
+  { word: 'მიკროფონი', clue: 'სცენა' },
+  { word: 'ჯალათი', clue: 'ყველაზე შესამჩნევი სიტყვა' },
+  { word: 'პარტიზანი', clue: 'დისკო' },
+  { word: 'ჯეირანი', clue: 'ქურციკი' },
+  { word: 'ლივერპული', clue: 'ბითლზი' },
+  { word: 'მწვრთნელი', clue: 'ფეოლა' },
+  { word: 'ტელევიზორი', clue: 'ანტენა' },
+  { word: 'სათამაშო', clue: 'რევოლუციამდელი ბავშვი' },
+  { word: 'ჩირაღდანი', clue: 'ცეცხლი' },
+  { word: 'შეჰერაზადი', clue: '1001 ღამე' },
+];
 
-
-/** Top entries kept in localStorage after sort */
 const TOP_N = 10;
 const STORAGE_SCORES = 'hangman-scores';
 const STORAGE_NAME = 'hangman-player-name';
 const WORDSET_ID = 'default';
 const ANONYMOUS = 'უცნობი';
 
-const btnNextWord = 'შემდეგი სიტყვა';
 const btnNewSession = 'ახალი თამაში';
-
-/** 1 per win, plus a bonus: maxMistakes − wrongCount (more „lives” left = higher bonus) */
-const BASE_WIN = 1;
-/** Set to 1 to subtract this many points from the session on a lost round. 0 = no penalty. */
-const LOSS_PENALTY = 0;
 
 let wordQueue = [];
 let currentIndex = 0;
@@ -110,23 +62,53 @@ let selectedWord = null;
 let correct = [];
 let incorrect = [];
 let roundActive = false;
-let sessionScore = 0;
-/** Words finished this session (each showRoundEnd), reset in startNewGame */
-let sessionRoundsCompleted = 0;
-let winStreak = 0;
-let bestStreak = 0;
+
+const solvedIndices = new Set();
 
 function maxMistakes() {
   return figure.length;
 }
 
-function updateSessionLabel() {
-  sessionScoreEl.textContent = String(sessionScore);
+/** Consecutive words solved from index 0 (Millionaire-style ladder). */
+function consecutiveSolvedCount() {
+  let i = 0;
+  while (i < wordQueue.length && solvedIndices.has(i)) {
+    i += 1;
+  }
+  return i;
+}
+
+function updateStepLabel() {
+  if (!stepProgressEl || !wordQueue.length) return;
+  const n = consecutiveSolvedCount();
+  const m = wordQueue.length;
+  stepProgressEl.textContent = `${n} / ${m}`;
 }
 
 function updateRoundProgress() {
   if (!roundProgressEl || !wordQueue.length) return;
   roundProgressEl.textContent = `${currentIndex + 1}/${wordQueue.length}`;
+}
+
+function updateNavButtons() {
+  const n = wordQueue.length;
+  const atLast = n > 0 && currentIndex >= n - 1;
+  const currentSolved = solvedIndices.has(currentIndex);
+
+  if (wordNavPrev) {
+    wordNavPrev.disabled = currentIndex <= 0;
+  }
+  if (wordNavNext) {
+    wordNavNext.disabled = !currentSolved || atLast;
+  }
+}
+
+function clearInlineStatus() {
+  if (roundInline) {
+    roundInline.textContent = '';
+    roundInline.hidden = true;
+  }
+  if (retryRow) retryRow.hidden = true;
 }
 
 function getStoredName() {
@@ -141,7 +123,7 @@ function setStoredName(name) {
   try {
     localStorage.setItem(STORAGE_NAME, name);
   } catch {
-    /* ignore quota / private mode */
+    /* ignore */
   }
 }
 
@@ -151,12 +133,10 @@ function updatePlayerDisplay() {
   }
 }
 
-function getResolvedPlayerName() {
-  const fromModal = playerNameInput && playerNameInput.value.trim();
-  if (fromModal) return fromModal;
-  const stored = getStoredName();
-  if (stored) return stored;
-  return ANONYMOUS;
+function scoreSortValue(r) {
+  if (typeof r.stepsPassed === 'number') return r.stepsPassed;
+  if (typeof r.totalScore === 'number') return r.totalScore;
+  return 0;
 }
 
 function loadScores() {
@@ -180,7 +160,8 @@ function saveScores(list) {
 
 function sortScores(list) {
   return list.slice().sort((a, b) => {
-    if (b.totalScore !== a.totalScore) return b.totalScore - a.totalScore;
+    const da = scoreSortValue(b) - scoreSortValue(a);
+    if (da !== 0) return da;
     return new Date(b.dateISO).getTime() - new Date(a.dateISO).getTime();
   });
 }
@@ -201,9 +182,12 @@ function renderLeaderboard() {
   leaderboardList.innerHTML = list
     .map((r) => {
       const date = r.dateISO ? new Date(r.dateISO).toLocaleString() : '';
-      const streak = typeof r.bestStreak === 'number' ? r.bestStreak : 0;
-      const rounds = typeof r.roundsPlayed === 'number' ? r.roundsPlayed : 0;
-      return `<li><strong>${escapeHtml(r.name)}</strong> — ${r.totalScore} ქულა · ${rounds} ტური · სერია ${streak}${date ? ` · ${escapeHtml(date)}` : ''}</li>`;
+      const steps = scoreSortValue(r);
+      const total =
+        typeof r.totalWords === 'number'
+          ? r.totalWords
+          : (typeof r.roundsPlayed === 'number' ? r.roundsPlayed : words.length);
+      return `<li><strong>${escapeHtml(r.name)}</strong> — ${steps} / ${total} ტური${date ? ` · ${escapeHtml(date)}` : ''}</li>`;
     })
     .join('');
 }
@@ -216,34 +200,26 @@ function escapeHtml(s) {
     .replace(/"/g, '&quot;');
 }
 
-function sessionEndSaveSnapshot() {
-  return {
-    totalScore: sessionScore,
-    roundsPlayed: sessionRoundsCompleted,
-    bestStreak,
-    dateISO: new Date().toISOString(),
-    wordsetId: WORDSET_ID,
-  };
-}
-
-function trySaveScore() {
-  const name = getResolvedPlayerName();
+/**
+ * @param {number} [stepsPassed] defaults to current ladder
+ * @param {number} [totalWords] defaults to wordQueue.length
+ */
+function trySaveScore(stepsPassed, totalWords) {
+  const name = getStoredName() || ANONYMOUS;
   if (name !== ANONYMOUS) {
     setStoredName(name);
   }
   updatePlayerDisplay();
-  if (playerNameInput) {
-    playerNameInput.value = getStoredName() || '';
-  }
 
-  const snap = sessionEndSaveSnapshot();
+  const total = totalWords != null ? totalWords : wordQueue.length;
+  const steps = stepsPassed != null ? stepsPassed : consecutiveSolvedCount();
+
   const record = {
     name,
-    totalScore: snap.totalScore,
-    roundsPlayed: snap.roundsPlayed,
-    bestStreak: snap.bestStreak,
-    dateISO: snap.dateISO,
-    wordsetId: snap.wordsetId,
+    stepsPassed: steps,
+    totalWords: total,
+    dateISO: new Date().toISOString(),
+    wordsetId: WORDSET_ID,
   };
 
   const next = mergeAndKeepTop(record);
@@ -254,87 +230,113 @@ function trySaveScore() {
   }
 }
 
-function shuffle(arr) {
-  const a = arr.slice();
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
-  }
-  return a;
+function startNewGame() {
+  wordQueue = words.map((w) => ({ ...w }));
+  currentIndex = 0;
+  solvedIndices.clear();
+  updateStepLabel();
+  if (viewSummary) viewSummary.hidden = true;
+  if (afterSummary) afterSummary.hidden = true;
+  loadWord(0);
 }
 
-function startNewGame() {
-  wordQueue = shuffle(words);
-  currentIndex = 0;
-  sessionScore = 0;
-  sessionRoundsCompleted = 0;
-  winStreak = 0;
-  bestStreak = 0;
-  updateSessionLabel();
-  loadWord(0);
+function applySolvedDisplay() {
+  if (!selectedWord) return;
+  const letters = selectedWord.word.split('');
+  const uniq = [...new Set(letters)];
+  correct = uniq.filter((L) => L !== ' ');
+  incorrect = [];
+  figure.forEach((el) => {
+    el.style.display = 'none';
+  });
+  showWord();
+  wrong.innerHTML = '';
+  roundActive = false;
+  updateNavButtons();
 }
 
 function loadWord(index) {
   currentIndex = index;
   selectedWord = wordQueue[currentIndex];
-  correct = [];
-  incorrect = [];
-  roundActive = true;
+  clearInlineStatus();
   roundScoreEl.textContent = '';
   if (savePanel) savePanel.hidden = true;
   if (saveFeedback) saveFeedback.textContent = '';
   if (viewSummary) viewSummary.hidden = true;
   if (afterSummary) afterSummary.hidden = true;
   winner.style.visibility = 'hidden';
-  play.textContent = btnNewSession;
+  if (play) play.textContent = btnNewSession;
+
+  if (solvedIndices.has(currentIndex)) {
+    applySolvedDisplay();
+  } else {
+    correct = [];
+    incorrect = [];
+    roundActive = true;
+    showWord();
+    wrongLetter();
+  }
+
   updateRoundProgress();
-  showWord();
-  wrongLetter();
+  updateStepLabel();
+  updateNavButtons();
 }
 
-function showRoundEnd(didWin) {
+function showEndSessionPanel() {
   roundActive = false;
-  sessionRoundsCompleted += 1;
-  if (didWin) {
-    winStreak += 1;
-    bestStreak = Math.max(bestStreak, winStreak);
-    const bonus = Math.max(0, maxMistakes() - incorrect.length);
-    const roundPts = BASE_WIN + bonus;
-    sessionScore += roundPts;
-    updateSessionLabel();
-    message.innerText = 'გილოცავთ! თქვენ გაიმარჯვეთ';
-    roundScoreEl.textContent =
-      bonus > 0
-        ? `ამ ტურში: +${roundPts} (ბაზა ${BASE_WIN} + ბონუსი ${bonus}) — ყველა: ${sessionScore}`
-        : `ამ ტურში: +${roundPts} — ყველა: ${sessionScore}`;
-  } else {
-    winStreak = 0;
-    if (LOSS_PENALTY > 0) {
-      sessionScore = Math.max(0, sessionScore - LOSS_PENALTY);
-      updateSessionLabel();
-    }
-    message.innerText = 'სამწუხაროდ, თქვენ ჩამოგახრჩვეს 😕';
-    roundScoreEl.textContent =
-      LOSS_PENALTY > 0
-        ? `წაგება: −${LOSS_PENALTY} — ყველა: ${sessionScore}`
-        : `ამ ტურში: 0 — ყველა: ${sessionScore}`;
-  }
-  const hasNext = currentIndex < wordQueue.length - 1;
-  play.textContent = hasNext ? btnNextWord : btnNewSession;
-  if (viewSummary) {
-    viewSummary.hidden = hasNext;
-  }
+  const m = wordQueue.length;
+  message.innerText = 'გილოცავთ! ყველა საფეხური გაიარეთ!';
+  roundScoreEl.textContent = `გავლილი ნაბიჯი: ${m} / ${m}`;
   if (savePanel) {
-    savePanel.hidden = hasNext;
-    if (!hasNext) {
-      if (saveFeedback) saveFeedback.textContent = '';
-      if (playerNameInput) playerNameInput.value = getStoredName();
-    }
+    savePanel.hidden = false;
+    if (saveFeedback) saveFeedback.textContent = '';
   }
+  if (viewSummary) viewSummary.hidden = false;
+  if (play) play.textContent = btnNewSession;
   winner.style.visibility = 'visible';
 }
 
+function handleWinRound() {
+  if (solvedIndices.has(currentIndex)) {
+    return;
+  }
+  roundActive = false;
+  solvedIndices.add(currentIndex);
+  updateStepLabel();
+
+  const isLast = currentIndex >= wordQueue.length - 1;
+
+  if (isLast) {
+    if (roundInline) {
+      roundInline.hidden = true;
+    }
+    showEndSessionPanel();
+  } else {
+    if (roundInline) {
+      roundInline.hidden = false;
+      const n = consecutiveSolvedCount();
+      const m = wordQueue.length;
+      roundInline.textContent = `გილოცავთ! ნაბიჯი ${n} / ${m} — „შემდეგი“ ხელმისაწვდომია.`;
+    }
+  }
+
+  updateNavButtons();
+}
+
+function handleLoseRound() {
+  roundActive = false;
+  if (roundInline) {
+    roundInline.hidden = false;
+    const n = consecutiveSolvedCount();
+    const m = wordQueue.length;
+    roundInline.textContent = `სამწუხაროდ, ტური ჩაგაგდოთ. ნაბიჯი: ${n} / ${m} — სცადეთ ისევ ან შეინახეთ ნაბიჯი.`;
+  }
+  if (retryRow) retryRow.hidden = false;
+  updateNavButtons();
+}
+
 function showWord() {
+  if (!selectedWord) return;
   word.innerHTML = `
     ${selectedWord.word
       .split('')
@@ -353,7 +355,7 @@ function showWord() {
   const inner = word.innerText.replace(/\n/g, '');
 
   if (inner === selectedWord.word) {
-    showRoundEnd(true);
+    handleWinRound();
   }
 }
 
@@ -372,7 +374,7 @@ function wrongLetter() {
     }
   });
   if (incorrect.length === figure.length) {
-    showRoundEnd(false);
+    handleLoseRound();
   }
 }
 
@@ -407,12 +409,45 @@ window.addEventListener('keydown', (e) => {
   }
 });
 
-play.addEventListener('click', () => {
-  if (play.textContent === btnNextWord) {
+if (wordNavPrev) {
+  wordNavPrev.addEventListener('click', () => {
+    if (currentIndex <= 0) return;
+    clearInlineStatus();
+    loadWord(currentIndex - 1);
+  });
+}
+
+if (wordNavNext) {
+  wordNavNext.addEventListener('click', () => {
+    if (!solvedIndices.has(currentIndex) || currentIndex >= wordQueue.length - 1) return;
+    clearInlineStatus();
     loadWord(currentIndex + 1);
-  } else {
-    startNewGame();
-  }
+  });
+}
+
+if (btnRetry) {
+  btnRetry.addEventListener('click', () => {
+    if (solvedIndices.has(currentIndex)) return;
+    clearInlineStatus();
+    correct = [];
+    incorrect = [];
+    roundActive = true;
+    showWord();
+    wrongLetter();
+  });
+}
+
+if (btnSaveLoss) {
+  btnSaveLoss.addEventListener('click', () => {
+    trySaveScore(consecutiveSolvedCount(), wordQueue.length);
+    if (roundInline) {
+      roundInline.textContent = `${roundInline.textContent} · ცხრილში შენახულია.`;
+    }
+  });
+}
+
+play.addEventListener('click', () => {
+  startNewGame();
 });
 
 if (viewSummary) {
@@ -438,70 +473,48 @@ if (newGameFromSummary) {
 }
 
 if (saveScoreBtn) {
-  saveScoreBtn.addEventListener('click', trySaveScore);
+  saveScoreBtn.addEventListener('click', () => {
+    trySaveScore(wordQueue.length, wordQueue.length);
+  });
 }
 
-if (playerNameInput) {
-  playerNameInput.addEventListener('change', () => {
-    const v = playerNameInput.value.trim();
-    if (v) setStoredName(v);
-    updatePlayerDisplay();
+function beginFromNameGate() {
+  const n = (nameGateInput && nameGateInput.value) ? nameGateInput.value.trim() : '';
+  if (!n) {
+    if (nameGateInput) nameGateInput.focus();
+    return;
+  }
+  setStoredName(n);
+  updatePlayerDisplay();
+  if (nameGate) nameGate.style.display = 'none';
+  if (gameScreen) gameScreen.hidden = false;
+  startNewGame();
+}
+
+if (nameGateStart) {
+  nameGateStart.addEventListener('click', beginFromNameGate);
+}
+if (nameGateInput) {
+  nameGateInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      beginFromNameGate();
+    }
   });
 }
 
 function initPlayerNameUI() {
   updatePlayerDisplay();
-  if (nameEditor) {
-    nameEditor.hidden = !!getStoredName();
+  if (nameGateInput) {
+    nameGateInput.value = getStoredName();
   }
-  if (playerNameHeader) {
-    playerNameHeader.value = getStoredName();
-  }
-  if (setNameBtn && nameEditor) {
-    setNameBtn.setAttribute('aria-expanded', String(!nameEditor.hidden));
-  }
-}
-
-if (setNameBtn && nameEditor) {
-  setNameBtn.addEventListener('click', () => {
-    const willShow = nameEditor.hidden;
-    nameEditor.hidden = !willShow;
-    setNameBtn.setAttribute('aria-expanded', String(willShow));
-    if (willShow && playerNameHeader) {
-      playerNameHeader.value = getStoredName();
-      playerNameHeader.focus();
-    }
-  });
-}
-
-if (saveHeaderName) {
-  saveHeaderName.addEventListener('click', () => {
-    const v = playerNameHeader ? playerNameHeader.value.trim() : '';
-    if (v) {
-      setStoredName(v);
-    } else {
-      try {
-        localStorage.removeItem(STORAGE_NAME);
-      } catch {
-        /* */
-      }
-    }
-    updatePlayerDisplay();
-    if (playerNameInput) playerNameInput.value = getStoredName() || '';
-    if (nameEditor) nameEditor.hidden = true;
-    if (setNameBtn) setNameBtn.setAttribute('aria-expanded', 'false');
-  });
-}
-
-if (playerNameHeader) {
-  playerNameHeader.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      if (saveHeaderName) saveHeaderName.click();
-    }
-  });
 }
 
 renderLeaderboard();
 initPlayerNameUI();
-startNewGame();
+
+if (nameGate) nameGate.style.display = 'flex';
+if (gameScreen) gameScreen.hidden = true;
+if (nameGateInput) {
+  setTimeout(() => nameGateInput.focus(), 0);
+}

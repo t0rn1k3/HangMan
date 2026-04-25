@@ -10,33 +10,45 @@
     <title>ჯალათი</title>
 </head>
 <body>
-    <div class="main">
+    <div class="nameGate" id="nameGate" role="dialog" aria-modal="true" aria-labelledby="nameGateTitle">
+        <div class="nameGateInner">
+            <h1 id="nameGateTitle">ჯალათი</h1>
+            <p class="nameGateHint">შეიყვანეთ თქვენი სახელი, შემდეგ დააჭირეთ „დაიწყე თამაში“</p>
+            <label class="nameLabel" for="nameGateInput">სახელი</label>
+            <input class="nameInput" type="text" id="nameGateInput" maxlength="32" autocomplete="name" />
+            <button type="button" class="nameGateStartBtn" id="nameGateStart">დაიწყე თამაში</button>
+        </div>
+    </div>
+
+    <div class="main" id="gameScreen" hidden>
         <header class="gameHeader">
             <h1>ჯალათი</h1>
             <div class="headerRow" role="group" aria-label="თამაშის მდგომარეობა">
-                <div class="headerStat">მოთამაშე: <span id="playerDisplayName"></span>
-                    <button type="button" class="setNameBtn" id="setNameBtn" aria-controls="nameEditor" aria-expanded="false">სახელი</button>
-                </div>
-                <div class="headerStat">ჯამური ქულა: <span id="sessionScore">0</span></div>
+                <div class="headerStat">მოთამაშე: <span id="playerDisplayName"></span></div>
+                <div class="headerStat">გავლილი ნაბიჯი: <span id="stepProgress">0 / 0</span></div>
                 <div class="headerStat" id="roundProgressLine">სიტყვა <span id="roundProgress">1/1</span></div>
             </div>
-            <div class="nameEditor" id="nameEditor" hidden>
-                <label class="nameLabel screenReader" for="playerNameHeader">სახელი</label>
-                <input class="nameInput" type="text" id="playerNameHeader" maxlength="32" autocomplete="nickname" placeholder="თქვენი სახელი" />
-                <button type="button" class="saveHeaderNameBtn" id="saveHeaderName">შენახვა</button>
-            </div>
         </header>
-        <p class="tagline">იპოვეთ დამალული სიტყვა</p>
+        <p class="tagline">იპოვეთ დამალული სიტყვა (რიგითობა — ფურცელზე)</p>
+
+        <div class="wordNav" id="wordNav" role="group" aria-label="სიტყვათა ნავიგაცია">
+            <button type="button" class="wordNavBtn" id="wordNavPrev" disabled>წინა</button>
+            <button type="button" class="wordNavBtn" id="wordNavNext" disabled>შემდეგი</button>
+        </div>
+
+        <p class="roundInline" id="roundInline" role="status" aria-live="polite" hidden></p>
+        <div class="retryRow" id="retryRow" hidden>
+            <button type="button" class="retryBtn" id="btnRetry">კიდევ ერთხელ (იგივე სიტყვა)</button>
+            <button type="button" class="saveLossBtn" id="btnSaveLoss">შედეგის შენახვა</button>
+        </div>
+
         <div class="gibbet">
             <svg>
                 <line x1="50" y1="20" x2="150" y2="20" />
                 <line x1="150" y1="20" x2="150" y2="70" />
                 <line x1="50" y1="250" x2="50" y2="20" />
                 <line x1="20" y1="250" x2="80" y2="250" />
-
-
                 <circle class="figure" cx="150" cy="90" r="20"/>
-
                 <line class="figure" x1="150" y1="110" x2="150" y2="170" />
                 <line class="figure" x1="150" y1="150" x2="130" y2="130"/>
                 <line class="figure" x1="150" y1="150" x2="170" y2="130"/>
@@ -54,8 +66,8 @@
                 <span id="clueText" class="clueText"></span>
             </div>
         </div>
-        <section class="leaderboard leaderboardPanel" id="leaderboardSection" aria-label="ქულათა სია">
-            <h2 class="leaderboardTitle">საუკეთესო ქულები (ტოპ 10)</h2>
+        <section class="leaderboard leaderboardPanel" id="leaderboardSection" aria-label="ნაბიჯების სია">
+            <h2 class="leaderboardTitle">საუკეთესო ნაბიჯები (ტოპ 10)</h2>
             <ol class="leaderboardList" id="leaderboardList"></ol>
             <div class="afterSummary" id="afterSummary" hidden>
                 <button type="button" class="playBtn" id="newGameFromSummary">ახალი თამაში</button>
@@ -63,17 +75,15 @@
         </section>
         <div id="won">
             <div class="won wonInner">
-                <h2 id='message'></h2>
+                <h2 id="message"></h2>
                 <p class="roundScore" id="roundScore"></p>
                 <div class="savePanel" id="savePanel" hidden>
-                    <label class="nameLabel" for="playerName">სახელი</label>
-                    <input class="nameInput" type="text" id="playerName" maxlength="32" autocomplete="nickname" />
-                    <button type="button" class="saveScoreBtn" id="saveScore">ქულის შენახვა</button>
+                    <button type="button" class="saveScoreBtn" id="saveScore">შედეგის შენახვა</button>
                 </div>
                 <p class="saveFeedback" id="saveFeedback" role="status" aria-live="polite"></p>
                 <div class="overlayActions" id="overlayActions">
                     <button type="button" class="viewSummaryBtn" id="viewSummary" hidden>შედეგის ნახვა</button>
-                    <button type="button" class="playBtn" id="play">შემდეგი სიტყვა</button>
+                    <button type="button" class="playBtn" id="play">ახალი თამაში</button>
                 </div>
             </div>
         </div>
@@ -81,8 +91,6 @@
             <p>თქვენ უკვე გამოიყენეთ ეს ასობგერა</p>
         </div>
     </div>
-
-
 
     <script src="js/main.js"></script>
 </body>
