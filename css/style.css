@@ -4,70 +4,13 @@
 body {
     background-color: #002379;
 }
-.nameGate {
-    position: fixed;
-    inset: 0;
-    z-index: 200;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0, 20, 90, 0.92);
-    padding: 1rem;
-}
-.nameGateInner {
-    width: 100%;
-    max-width: 360px;
-    background: rgba(255, 255, 255, 0.06);
-    border: 1px solid rgba(255, 197, 90, 0.35);
-    border-radius: 12px;
-    padding: 1.5rem 1.25rem;
-    text-align: center;
-}
-.nameGateInner h1 {
-    margin-top: 0;
-    color: #fff;
-}
-.nameGateHint {
-    color: #e0e0e0;
-    font-size: 0.95rem;
-    margin: 0 0 1rem;
-    line-height: 1.4;
-}
-.nameGate .nameLabel {
-    display: block;
-    color: #FFC55A;
-    font-size: 0.9rem;
-    margin-bottom: 0.35rem;
-    text-align: left;
-}
-.nameGate .nameInput {
-    width: 100%;
-    margin-bottom: 1rem;
-    padding: 0.55rem 0.6rem;
-    font-size: 1rem;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-}
-.nameGateStartBtn {
-    width: 100%;
-    padding: 0.55rem 1rem;
-    font-size: 1.05rem;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
-    border-radius: 6px;
-    background: linear-gradient(180deg, #ffe6a8, #FFC55A);
-    color: #1a1a1a;
-}
-.nameGateStartBtn:hover {
-    filter: brightness(1.05);
-}
-.wordNav {
+.wordNav,
+.wordNavBelow {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 0.75rem;
-    margin: 0.25rem 0 0.75rem;
+    margin: 0.9rem 0 0.25rem;
 }
 .wordNavBtn {
     min-width: 120px;
@@ -114,18 +57,6 @@ body {
 .retryBtn:hover {
     background: rgba(255, 200, 200, 0.4);
 }
-.saveLossBtn {
-    padding: 0.4rem 0.9rem;
-    font-size: 0.9rem;
-    cursor: pointer;
-    border-radius: 6px;
-    border: 1px solid rgba(255, 197, 90, 0.5);
-    background: rgba(200, 230, 255, 0.2);
-    color: #e8f4ff;
-}
-.saveLossBtn:hover {
-    background: rgba(200, 230, 255, 0.35);
-}
 .main {
     width: 70%;
     margin: auto;
@@ -159,10 +90,6 @@ h1 {
     text-align: center;
     margin: 0.35rem 0 0.5rem;
     font-size: 0.95rem;
-}
-#playerDisplayName {
-    color: #fff;
-    font-weight: 600;
 }
 #stepProgress {
     font-weight: 700;
@@ -200,6 +127,7 @@ svg {
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 0.25rem;
 }
 #wrong-letter {
     color: white;
@@ -211,109 +139,21 @@ svg {
 #wrong-letter span {
     font-size: 20px;
 }
-.word {
+.gibbet .word {
+    margin-top: 0.5rem;
     color: white;
     display: flex;
     font-size: 30px;
     justify-content: space-between;
     width: 350px;
 }
-.clue {
+.gibbet .clue {
     color: white;
-    margin-top: 100px;
+    margin-top: 0.5rem;
     font-size: 20px;
-}
-.leaderboard {
-    color: #fff;
-    max-width: 420px;
-    margin: 1.5rem auto 0;
-    padding: 0 0.5rem;
-}
-.leaderboardPanel {
-    background: rgba(0, 0, 0, 0.25);
-    border: 1px solid rgba(255, 197, 90, 0.25);
-    border-radius: 10px;
-    padding: 0.75rem 1rem 1rem;
-    max-height: 45vh;
-    overflow: auto;
-}
-.leaderboardPanel.leaderboardFlash {
-    animation: boardFlash 1.2s ease;
-}
-@keyframes boardFlash {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(255, 197, 90, 0); }
-    40% { box-shadow: 0 0 0 3px rgba(255, 197, 90, 0.45); }
-}
-.leaderboardTitle {
-    font-size: 1.15rem;
-    font-weight: 600;
-    margin: 0 0 0.5rem;
-    text-align: center;
-    color: #FFC55A;
-}
-.leaderboardList {
-    margin: 0;
-    padding-left: 1.25rem;
-    font-size: 0.95rem;
-    line-height: 1.5;
-    color: #e8e8e8;
-}
-.leaderboardList li {
-    margin-bottom: 0.25rem;
-}
-.afterSummary {
-    display: flex;
-    justify-content: center;
-    margin-top: 0.75rem;
-    padding-top: 0.5rem;
-    border-top: 1px solid rgba(255, 197, 90, 0.15);
-}
-.afterSummary .playBtn {
-    max-width: 220px;
-    flex: none;
-}
-.savePanel {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    margin: 0.75rem 0 0;
-    width: 100%;
-    max-width: 280px;
-}
-.nameLabel {
-    color: #e0e0e0;
-    font-size: 0.9rem;
-}
-.nameInput {
-    width: 100%;
-    max-width: 240px;
-    padding: 0.45rem 0.5rem;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background: #fff;
-    color: #1a1a1a;
-}
-.saveScoreBtn {
-    padding: 0.45rem 1rem;
-    font-size: 0.95rem;
-    cursor: pointer;
-    border: 1px solid rgb(44, 0, 44);
-    background-color: rgb(200, 220, 255);
-    color: rgb(44, 0, 44);
-    border-radius: 4px;
-}
-.saveFeedback {
-    min-height: 1.2em;
-    color: #a8e6a8;
-    text-align: center;
-    font-size: 0.95rem;
-    margin: 0.35rem 0 0;
 }
 .clueText {
     color: #FFC55A;
-    font-style: italic;
 }
 .letter {
     border-bottom: 2px solid rgb(244, 236, 255);
@@ -358,7 +198,7 @@ svg {
     margin-top: 1.25rem;
     width: 100%;
 }
-.playBtn, .viewSummaryBtn {
+.playBtn {
     min-width: 150px;
     min-height: 50px;
     padding: 0.35rem 0.75rem;
@@ -367,18 +207,11 @@ svg {
     border-radius: 4px;
     font-size: 0.95rem;
     color: rgb(44, 0, 44);
-}
-.playBtn {
     background-color: rgb(223, 207, 250);
     flex: 1 1 140px;
     max-width: 240px;
 }
-.viewSummaryBtn {
-    background-color: rgba(200, 230, 255, 0.95);
-    flex: 1 1 140px;
-    max-width: 240px;
-}
-.viewSummaryBtn:hover, .playBtn:hover {
+.playBtn:hover {
     filter: brightness(1.05);
 }
 
