@@ -1,8 +1,9 @@
 const word = document.getElementById('word');
 const clueText = document.getElementById('clueText');
 const wrong = document.getElementById('wrong-letter');
-const won = document.getElementById('won');
 const message = document.getElementById('message');
+const roundScoreEl = document.getElementById('roundScore');
+const sessionScoreEl = document.getElementById('sessionScore');
 const play = document.getElementById('play');
 const notification = document.getElementById('not');
 const winner = document.querySelector('.won')
@@ -76,12 +77,26 @@ const words = [
 const btnNext = 'შემდეგი სიტყვა';
 const btnNew = 'ითამაშეთ ახლიდან';
 
+/** 1 per win, plus a bonus: maxMistakes − wrongCount (more „lives” left = higher bonus) */
+const BASE_WIN = 1;
+/** Set to 1 to subtract this many points from the session on a lost round. 0 = no penalty. */
+const LOSS_PENALTY = 0;
+
 let wordQueue = [];
 let currentIndex = 0;
 let selectedWord = null;
 let correct = [];
 let incorrect = [];
 let roundActive = false;
+let sessionScore = 0;
+
+function maxMistakes() {
+  return figure.length;
+}
+
+function updateSessionLabel() {
+  sessionScoreEl.textContent = String(sessionScore);
+}
 
 function shuffle(arr) {
   const a = arr.slice();
@@ -95,6 +110,8 @@ function shuffle(arr) {
 function startNewGame() {
   wordQueue = shuffle(words);
   currentIndex = 0;
+  sessionScore = 0;
+  updateSessionLabel();
   loadWord(0);
 }
 
@@ -104,7 +121,8 @@ function loadWord(index) {
   correct = [];
   incorrect = [];
   roundActive = true;
-  won.style.visibility = 'hidden';
+  roundScoreEl.textContent = '';
+  winner.style.visibility = 'hidden';
   play.textContent = btnNew;
   showWord();
   wrongLetter();
@@ -113,9 +131,25 @@ function loadWord(index) {
 function showRoundEnd(didWin) {
   roundActive = false;
   if (didWin) {
+    const bonus = Math.max(0, maxMistakes() - incorrect.length);
+    const roundPts = BASE_WIN + bonus;
+    sessionScore += roundPts;
+    updateSessionLabel();
     message.innerText = 'გილოცავთ! თქვენ გაიმარჯვეთ';
+    roundScoreEl.textContent =
+      bonus > 0
+        ? `ამ ტურში: +${roundPts} (ბაზა ${BASE_WIN} + ბონუსი ${bonus}) — ყველა: ${sessionScore}`
+        : `ამ ტურში: +${roundPts} — ყველა: ${sessionScore}`;
   } else {
+    if (LOSS_PENALTY > 0) {
+      sessionScore = Math.max(0, sessionScore - LOSS_PENALTY);
+      updateSessionLabel();
+    }
     message.innerText = 'სამწუხაროდ, თქვენ ჩამოგახრჩვეს 😕';
+    roundScoreEl.textContent =
+      LOSS_PENALTY > 0
+        ? `წაგება: −${LOSS_PENALTY} — ყველა: ${sessionScore}`
+        : `ამ ტურში: 0 — ყველა: ${sessionScore}`;
   }
   const hasNext = currentIndex < wordQueue.length - 1;
   play.textContent = hasNext ? btnNext : btnNew;
@@ -196,15 +230,11 @@ window.addEventListener('keydown', (e) => {
 });
 
 play.addEventListener('click', () => {
-  if (winner.style.visibility === 'visible' && play.textContent === btnNext) {
+  if (play.textContent === btnNext) {
     loadWord(currentIndex + 1);
-    return;
-  }
-  if (winner.style.visibility === 'visible' && play.textContent === btnNew) {
+  } else {
     startNewGame();
-    return;
   }
-  startNewGame();
 });
 
 startNewGame();
