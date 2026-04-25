@@ -41,10 +41,20 @@
                 <span id="clueText" class="clueText"></span>
             </div>
         </div>
+        <section class="leaderboard" id="leaderboardSection" aria-label="ქულათა სია">
+            <h2 class="leaderboardTitle">საუკეთესო ქულები</h2>
+            <ol class="leaderboardList" id="leaderboardList"></ol>
+        </section>
         <div id="won">
             <div class="won">
                 <h2 id='message'></h2>
                 <p class="roundScore" id="roundScore"></p>
+                <div class="savePanel" id="savePanel" hidden>
+                    <label class="nameLabel" for="playerName">სახელი</label>
+                    <input class="nameInput" type="text" id="playerName" maxlength="32" autocomplete="nickname" />
+                    <button type="button" class="saveScoreBtn" id="saveScore">ქულის შენახვა</button>
+                </div>
+                <p class="saveFeedback" id="saveFeedback" role="status" aria-live="polite"></p>
                 <button id="play">ითამაშეთ ახლიდან</button>
             </div>
         </div>
