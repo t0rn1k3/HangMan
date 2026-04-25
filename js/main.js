@@ -5,6 +5,11 @@ const message = document.getElementById('message');
 const roundScoreEl = document.getElementById('roundScore');
 const sessionScoreEl = document.getElementById('sessionScore');
 const play = document.getElementById('play');
+const viewSummary = document.getElementById('viewSummary');
+const roundProgressEl = document.getElementById('roundProgress');
+const leaderboardSection = document.getElementById('leaderboardSection');
+const afterSummary = document.getElementById('afterSummary');
+const newGameFromSummary = document.getElementById('newGameFromSummary');
 const notification = document.getElementById('not');
 const savePanel = document.getElementById('savePanel');
 const playerNameInput = document.getElementById('playerName');
@@ -91,8 +96,8 @@ const STORAGE_NAME = 'hangman-player-name';
 const WORDSET_ID = 'default';
 const ANONYMOUS = 'უცნობი';
 
-const btnNext = 'შემდეგი სიტყვა';
-const btnNew = 'ითამაშეთ ახლიდან';
+const btnNextWord = 'შემდეგი სიტყვა';
+const btnNewSession = 'ახალი თამაში';
 
 /** 1 per win, plus a bonus: maxMistakes − wrongCount (more „lives” left = higher bonus) */
 const BASE_WIN = 1;
@@ -117,6 +122,11 @@ function maxMistakes() {
 
 function updateSessionLabel() {
   sessionScoreEl.textContent = String(sessionScore);
+}
+
+function updateRoundProgress() {
+  if (!roundProgressEl || !wordQueue.length) return;
+  roundProgressEl.textContent = `${currentIndex + 1}/${wordQueue.length}`;
 }
 
 function getStoredName() {
@@ -273,8 +283,11 @@ function loadWord(index) {
   roundScoreEl.textContent = '';
   if (savePanel) savePanel.hidden = true;
   if (saveFeedback) saveFeedback.textContent = '';
+  if (viewSummary) viewSummary.hidden = true;
+  if (afterSummary) afterSummary.hidden = true;
   winner.style.visibility = 'hidden';
-  play.textContent = btnNew;
+  play.textContent = btnNewSession;
+  updateRoundProgress();
   showWord();
   wrongLetter();
 }
@@ -307,7 +320,10 @@ function showRoundEnd(didWin) {
         : `ამ ტურში: 0 — ყველა: ${sessionScore}`;
   }
   const hasNext = currentIndex < wordQueue.length - 1;
-  play.textContent = hasNext ? btnNext : btnNew;
+  play.textContent = hasNext ? btnNextWord : btnNewSession;
+  if (viewSummary) {
+    viewSummary.hidden = hasNext;
+  }
   if (savePanel) {
     savePanel.hidden = hasNext;
     if (!hasNext) {
@@ -392,12 +408,34 @@ window.addEventListener('keydown', (e) => {
 });
 
 play.addEventListener('click', () => {
-  if (play.textContent === btnNext) {
+  if (play.textContent === btnNextWord) {
     loadWord(currentIndex + 1);
   } else {
     startNewGame();
   }
 });
+
+if (viewSummary) {
+  viewSummary.addEventListener('click', () => {
+    winner.style.visibility = 'hidden';
+    if (afterSummary) afterSummary.hidden = false;
+    if (leaderboardSection) {
+      window.requestAnimationFrame(() => {
+        leaderboardSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        leaderboardSection.classList.add('leaderboardFlash');
+        window.setTimeout(() => {
+          leaderboardSection.classList.remove('leaderboardFlash');
+        }, 1200);
+      });
+    }
+  });
+}
+
+if (newGameFromSummary) {
+  newGameFromSummary.addEventListener('click', () => {
+    startNewGame();
+  });
+}
 
 if (saveScoreBtn) {
   saveScoreBtn.addEventListener('click', trySaveScore);
